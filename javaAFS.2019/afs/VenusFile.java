@@ -5,20 +5,26 @@ package afs;
 import java.rmi.*; 
 import java.io.*;
 
-import java.io.File;
-
 public class VenusFile {
     public static final String cacheDir = "Cache/";
-    private static File file;
+    private RandomAccessFile file;
+    private Venus venus;
 
     public VenusFile(Venus venus, String fileName, String mode) throws RemoteException, IOException, FileNotFoundException {
-        file = new File("./" + cacheDir + fileName);
-        if(file.isFile()) {
-            return;
+        this.venus = venus;
+
+        String filePath = "./" + cacheDir + fileName;
+        
+        // Checks if files is already in cache
+        File f = new File(filePath);
+        if(f.createNewFile()) {
+            // File is not in cache, then file is downloaded and save it in cache directory
+            file = new RandomAccessFile(filePath, "rw");
+            downloadFile(fileName);
+            file.close();
         }
-
-        venus.getSrv().download(fileName);
-
+        
+        file = new RandomAccessFile(filePath, mode);
     }
 
     public int read(byte[] b) throws RemoteException, IOException {
@@ -39,6 +45,19 @@ public class VenusFile {
 
     public void close() throws RemoteException, IOException {
         return;
+    }
+
+    private void downloadFile(String fileName) throws RemoteException, IOException {
+        ViceReader viceReader = (ViceReader) venus.getSrv().download(fileName);
+        byte[] filecontent = new byte[venus.getBlockSize()];
+        while(true) {
+            filecontent = viceReader.read(venus.getBlockSize());
+            if(filecontent == null) {
+                break;
+            }
+            for(int i= 0; i < filecontent.length && filecontent[i] != 0; i++)
+                file.write(filecontent[i]);
+        }
     }
 }
 

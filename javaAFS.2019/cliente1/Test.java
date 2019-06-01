@@ -20,6 +20,7 @@ class Test {
             String fich = s.next();
             String modo ="r";
             if ((s.hasNext()) && s.next().equals("rw")) modo ="rw";
+            System.out.println("L23");
             VenusFile f = new VenusFile(venus, fich, modo);
             descriptorMap.put(desc, f);
             System.out.println("Fichero abierto ID " + desc++);
@@ -33,17 +34,19 @@ class Test {
     static private boolean doRead(Scanner ent) throws RemoteException {
         boolean res = false;
         try {
-            System.out.println("Introduzca ID de fichero y cantidad a leer");
+            System.out.println("Introduzca ID de fichero y cantidad a leer");   
             if (!ent.hasNextLine()) return false;
             String lin = ent.nextLine();
             Scanner s = new Scanner(lin);
+
             if (s.hasNextInt()) {
                 int ID = s.nextInt();
+                System.out.println(ID);
                 if (s.hasNextInt()) {
                     int tam = s.nextInt();
                     res = true;
                     VenusFile f = descriptorMap.get(ID);
-                    if (f ==null)
+                    if (f == null)
                         System.out.println("ID de fichero inválido");
                     else {
                         byte [] buf = new byte[tam];
