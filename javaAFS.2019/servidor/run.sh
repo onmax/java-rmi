@@ -1,4 +1,6 @@
 #!/bin/bash
+fuser -k 10000/tcp
+
 ./compila_servidor.sh
-./arranca_rmiregistry 12388 &
-./ejecuta_servidor.sh 12388
+./arranca_rmiregistry 10000 &
+./ejecuta_servidor.sh 10000

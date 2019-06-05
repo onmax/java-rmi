@@ -8,9 +8,11 @@ import java.rmi.server.*;
 public class VenusCBImpl extends UnicastRemoteObject implements VenusCB {
     public VenusCBImpl() throws RemoteException {
     }
+    
     public void invalidate(String fileName /* añada los parámetros que requiera */)
         throws RemoteException {
-        return;
+            File file = new File("./Cache/" + fileName);
+            file.delete();
     }
 }
 

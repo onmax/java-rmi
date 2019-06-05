@@ -7,7 +7,7 @@ import java.io.*;
 public interface ViceReader extends Remote {
     public byte[] read(int tam) throws IOException, RemoteException;
     public void close() throws IOException, RemoteException;
-    public String getFileName() throws RemoteException;
+    public long getFileSize() throws IOException, RemoteException;
     /* añada los métodos remotos que requiera */
 }       
 

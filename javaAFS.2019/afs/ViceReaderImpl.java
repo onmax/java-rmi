@@ -3,29 +3,37 @@
 package afs;
 import java.rmi.*;
 import java.rmi.server.*;
-
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.io.*;
 
 public class ViceReaderImpl extends UnicastRemoteObject implements ViceReader {
     private static final String AFSDir = "./AFSDir/";
-    private String fileName;
     private RandomAccessFile file;
+    private String fileName;
+    ViceImpl viceImpl;
+    ReentrantReadWriteLock lock;
 
-    public ViceReaderImpl(String fileName /* añada los parámetros que requiera */)
+    public ViceReaderImpl(String fileName, String mode, ViceImpl viceImpl)
 		    throws IOException, RemoteException {
+        this.file = new RandomAccessFile(AFSDir + fileName, mode);
         this.fileName = fileName;
-        file = new RandomAccessFile(AFSDir + fileName, "r");
+        this.viceImpl = viceImpl;
     }
-    public String getFileName()  throws RemoteException {
-        return fileName;
-    }
+    
     public byte[] read(int tam) throws IOException, RemoteException {
+        lock = ViceImpl.viceImpl.lockManager.bind(this.fileName);
+        lock.readLock().lock();
         byte[] bytes = new byte[tam];
-        if(file.read(bytes) < 0) return null;
-        return bytes;
+        return this.file.read(bytes) < 0 ? null : bytes;
     }
+
+    public long getFileSize() throws IOException, RemoteException {
+        return this.file.length();
+    }
+    
     public void close() throws IOException, RemoteException {
-        file.close();
+        lock.readLock().unlock();
+        this.file.close();
     }
 }       
 
