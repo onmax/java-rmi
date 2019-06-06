@@ -7,9 +7,9 @@ import java.io.*;
 
 
 public interface Vice extends Remote {
-    public ViceReader download(String fileName, String mode, VenusCBImpl venusCBImpl /* añada los parámetros que requiera */)
+    public ViceReader download(String fileName, String mode /* añada los parámetros que requiera */)
           throws IOException, RemoteException;
-    public ViceWriter upload(String fileName, VenusCBImpl venusCBImpl /* añada los parámetros que requiera */)
+    public ViceWriter upload(String fileName /* añada los parámetros que requiera */)
           throws IOException, RemoteException;
 
     /* añada los métodos remotos que requiera */

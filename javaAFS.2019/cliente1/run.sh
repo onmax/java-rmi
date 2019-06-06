@@ -1,5 +1,4 @@
 #!/bin/bash
-
 ./compila_test.sh
 export REGISTRY_HOST=localhost
 export REGISTRY_PORT=10000

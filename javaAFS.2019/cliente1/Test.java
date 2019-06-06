@@ -20,6 +20,7 @@ class Test {
             String fich = s.next();
             String modo ="r";
             if ((s.hasNext()) && s.next().equals("rw")) modo ="rw";
+            System.out.println("L23");
             VenusFile f = new VenusFile(venus, fich, modo);
             descriptorMap.put(desc, f);
             System.out.println("Fichero abierto ID " + desc++);

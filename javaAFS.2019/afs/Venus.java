@@ -10,15 +10,13 @@ public class Venus {
     static private String registryPort;
     static private int blockSize;
     static private Vice srv;
-    static private VenusCBImpl venusCBImpl;
 
 
     public Venus() {
         registryHost = System.getenv("REGISTRY_HOST");
         registryPort = System.getenv("REGISTRY_PORT");
         blockSize = Integer.parseInt(System.getenv("BLOCKSIZE"));
-        venusCBImpl = new VenusCBImpl();
-        
+
         try {
             srv = (Vice) Naming.lookup("//" + registryHost + ":" + registryPort + "/AFS");
         } catch (RemoteException e) {
@@ -29,24 +27,20 @@ public class Venus {
         }
     }
 
-    public String getRegistryHost() {
+    protected String getRegistryHost() {
         return registryHost;
     }
 
-    public String getRegistryPort() {
+    protected String getRegistryPort() {
         return registryPort;
     }
 
-    public int getBlockSize() {
+    protected int getBlockSize() {
         return blockSize;
     }
 
-    public Vice getSrv() {
+    protected Vice getSrv() {
         return srv;
-    }
-
-    public VenusCBImpl getVenusCBImpl() {
-        return venusCBImpl;
     }
 }
 
