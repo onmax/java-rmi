@@ -29,8 +29,11 @@ public class VenusFile {
     }
 
     private void downloadFile(String filePath) throws RemoteException, IOException {
+        
         boolean fileExistsInServer = venus.getSrv().fileExists(fileName);
+        System.out.println(!fileExistsInServer && this.mode.equals("rw"));
         if(!fileExistsInServer && this.mode.equals("rw")) return;
+        System.out.println("Descargando archivo " +  filePath +" ...");
 
         ViceReader viceReader = (ViceReader) venus.getSrv().download(this.fileName);
         RandomAccessFile f = new RandomAccessFile(filePath, "rw");
@@ -82,7 +85,7 @@ public class VenusFile {
             }
 
             int lastBlockSize = (int) file.length() % venus.getBlockSize();
-            if (--lastBlockSize > 0) {
+            if (lastBlockSize > 0) {
                 content = new byte[lastBlockSize];
                 read(content);
                 viceWriter.write(content);

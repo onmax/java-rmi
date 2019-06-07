@@ -7,6 +7,8 @@ import java.rmi.server.*;
 import java.io.*;
 
 public class ViceImpl extends UnicastRemoteObject implements Vice {
+  private static final String AFSDir = "./AFSDir/";
+
   public ViceImpl() throws IOException, RemoteException {
   }
 
@@ -19,7 +21,7 @@ public class ViceImpl extends UnicastRemoteObject implements Vice {
   }
 
   public boolean fileExists(String fileName) throws RemoteException {
-    File f = new File(fileName);
+    File f = new File(AFSDir + fileName);
     return f.exists();
   }
 
