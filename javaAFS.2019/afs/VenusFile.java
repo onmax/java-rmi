@@ -21,19 +21,21 @@ public class VenusFile {
         this.modified = false;
         String filePath = "./" + cacheDir + fileName;
 
+        venus.getSrv().addToCallbacksMap(this.fileName, this.venus.getVenusCBImpl());
+    
         // Checks if files is already in cache
         File f = new File(filePath);
-        if (!f.exists())
+        if (f.exists())
             downloadFile(filePath);
+            
         file = new RandomAccessFile(filePath, this.mode);
     }
 
     private void downloadFile(String filePath) throws RemoteException, IOException {
-        
+
         boolean fileExistsInServer = venus.getSrv().fileExists(fileName);
-        System.out.println(!fileExistsInServer && this.mode.equals("rw"));
-        if(!fileExistsInServer && this.mode.equals("rw")) return;
-        System.out.println("Descargando archivo " +  filePath +" ...");
+        if (!fileExistsInServer && this.mode.equals("rw"))
+            return;
 
         ViceReader viceReader = (ViceReader) venus.getSrv().download(this.fileName);
         RandomAccessFile f = new RandomAccessFile(filePath, "rw");
@@ -71,7 +73,7 @@ public class VenusFile {
     public void close() throws RemoteException, IOException {
         if (mode.equals("rw") && this.modified) {
             // Eliminamos el contenido del fichero en el servidor
-            ViceWriter viceWriter = (ViceWriter) venus.getSrv().upload(fileName);
+            ViceWriter viceWriter = (ViceWriter) venus.getSrv().upload(fileName, this.venus.getVenusCBImpl());
             viceWriter.removeContent();
 
             // Leemos el contenido del fichero de bloque en bloque y lo escribimos en el

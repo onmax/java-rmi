@@ -6,7 +6,8 @@ import java.rmi.*;
 import java.io.*;
 
 public interface Vice extends Remote {
+      public void addToCallbacksMap(String fileName, VenusCB venusCB) throws RemoteException;
       public ViceReader download(String fileName) throws IOException, RemoteException;
-      public ViceWriter upload(String fileName) throws IOException, RemoteException;
+      public ViceWriter upload(String fileName, VenusCB venusCB) throws IOException, RemoteException;
       public boolean fileExists(String fileName) throws RemoteException;
 }
