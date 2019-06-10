@@ -4,31 +4,48 @@ package afs;
 
 import java.rmi.*;
 import java.rmi.server.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.io.*;
-import java.util.*;
 
 public class ViceImpl extends UnicastRemoteObject implements Vice {
-  static LockManager lockManager;
-  static HashMap<String,  ArrayList<VenusCBImpl>> map = new HashMap<String, ArrayList<VenusCBImpl>>();
+  private static final String AFSDir = "./AFSDir/";
+  private static HashMap<String, ArrayList<VenusCB>> callbacksMap;
+  private static LockManager lockManager;
 
   public ViceImpl() throws IOException, RemoteException {
     ViceImpl.lockManager = new LockManager();
+    ViceImpl.callbacksMap = new HashMap<String, ArrayList<VenusCB>>();
   }
 
-  private addCallback(String fileName) {
-    if(!ViceImpl.map.containsKey(fileName)) {
-      ViceImpl.map.put(fileName, new ArrayList<>());
+  public void addToCallbacksMap(String fileName, VenusCB venusCB) throws RemoteException {
+    if(!ViceImpl.callbacksMap.containsKey(fileName)) {
+      ViceImpl.callbacksMap.put(fileName, new ArrayList<VenusCB>());
     }
-    ViceImpl.map.get(fileName).add(new VenusCBImpl());
+    ViceImpl.callbacksMap.get(fileName).add(venusCB);
   }
 
-  public ViceReader download(String fileName, String mode, VenusCBImpl venusCBImpl)
-      throws IOException, RemoteException {
-    addCallback(fileName);
-    return new ViceReaderImpl(fileName, mode, venusCBImpl);
+  public ViceReader download(String fileName) throws IOException, RemoteException {
+    return new ViceReaderImpl(fileName, ViceImpl.lockManager);
   }
 
-  public ViceWriter upload(String fileName, VenusCBImpl venusCBImpl) throws IOException, RemoteException {
-    return new ViceWriterImpl(fileName, venusCBImpl);
+  public ViceWriter upload(String fileName, VenusCB venusCB) throws IOException, RemoteException {
+    ArrayList<VenusCB> callbacks = ViceImpl.callbacksMap.get(fileName);
+    int index = -1;
+    for(int i = 0; i < callbacks.size(); i++) {
+      if(!callbacks.get(i).equals(venusCB))
+        callbacks.get(i).invalidate("./Cache/" + fileName);
+      else
+        index = i;
+    }
+    ViceImpl.callbacksMap.get(fileName).remove(index);
+    
+    return new ViceWriterImpl(fileName, ViceImpl.lockManager);
   }
+
+  public boolean fileExists(String fileName) throws RemoteException {
+    File f = new File(AFSDir + fileName);
+    return f.exists();
+  }
+
 }

@@ -4,6 +4,7 @@ package afs;
 
 import java.rmi.*; 
 import java.rmi.server.*;
+import afs.VenusCBImpl;
 
 public class Venus {
     static private String registryHost;
@@ -13,14 +14,13 @@ public class Venus {
     static private VenusCBImpl venusCBImpl;
 
 
-    public Venus() {
-        registryHost = System.getenv("REGISTRY_HOST");
-        registryPort = System.getenv("REGISTRY_PORT");
-        blockSize = Integer.parseInt(System.getenv("BLOCKSIZE"));
-        venusCBImpl = new VenusCBImpl();
-        
+    public Venus() throws RemoteException {
+        Venus.registryHost = System.getenv("REGISTRY_HOST");
+        Venus.registryPort = System.getenv("REGISTRY_PORT");
+        Venus.blockSize = Integer.parseInt(System.getenv("BLOCKSIZE"));
+        Venus.venusCBImpl = new VenusCBImpl();
         try {
-            srv = (Vice) Naming.lookup("//" + registryHost + ":" + registryPort + "/AFS");
+            srv = (Vice) Naming.lookup("//" + Venus.registryHost + ":" + Venus.registryPort + "/AFS");
         } catch (RemoteException e) {
             System.err.println("Error de comunicacion: " + e.toString());
         } catch (Exception e) {
@@ -30,23 +30,23 @@ public class Venus {
     }
 
     public String getRegistryHost() {
-        return registryHost;
+        return Venus.registryHost;
     }
 
     public String getRegistryPort() {
-        return registryPort;
+        return Venus.registryPort;
     }
 
     public int getBlockSize() {
-        return blockSize;
+        return Venus.blockSize;
     }
 
     public Vice getSrv() {
-        return srv;
+        return Venus.srv;
     }
 
     public VenusCBImpl getVenusCBImpl() {
-        return venusCBImpl;
+        return Venus.venusCBImpl;
     }
 }
 

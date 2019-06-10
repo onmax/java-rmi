@@ -2,17 +2,16 @@
 // para gestionar callbacks
 package afs;
 
+import java.io.File;
 import java.rmi.*;
 import java.rmi.server.*;
 
 public class VenusCBImpl extends UnicastRemoteObject implements VenusCB {
     public VenusCBImpl() throws RemoteException {
     }
-    
-    public void invalidate(String fileName /* añada los parámetros que requiera */)
-        throws RemoteException {
-            File file = new File("./Cache/" + fileName);
-            file.delete();
+
+    public void invalidate(String filePath) throws RemoteException {
+        File f = new File(filePath);
+        f.delete();
     }
 }
-
