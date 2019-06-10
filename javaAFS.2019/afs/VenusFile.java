@@ -21,23 +21,18 @@ public class VenusFile {
         this.modified = false;
         String filePath = "./" + cacheDir + fileName;
 
-        venus.getSrv().addToCallbacksMap(this.fileName, this.venus.getVenusCBImpl());
-    
         // Checks if files is already in cache
         File f = new File(filePath);
-        if (f.exists())
+        if (!f.exists())
             downloadFile(filePath);
             
         file = new RandomAccessFile(filePath, this.mode);
     }
 
     private void downloadFile(String filePath) throws RemoteException, IOException {
-
-        boolean fileExistsInServer = venus.getSrv().fileExists(fileName);
-        if (!fileExistsInServer && this.mode.equals("rw"))
+        ViceReader viceReader = (ViceReader) venus.getSrv().download(this.fileName, this.mode, this.venus.getVenusCBImpl());
+        if(viceReader == null)
             return;
-
-        ViceReader viceReader = (ViceReader) venus.getSrv().download(this.fileName);
         RandomAccessFile f = new RandomAccessFile(filePath, "rw");
         long size = viceReader.getFileSize();
         byte[] buffer;

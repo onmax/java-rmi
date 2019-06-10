@@ -18,28 +18,30 @@ public class ViceImpl extends UnicastRemoteObject implements Vice {
     ViceImpl.callbacksMap = new HashMap<String, ArrayList<VenusCB>>();
   }
 
-  public void addToCallbacksMap(String fileName, VenusCB venusCB) throws RemoteException {
-    if(!ViceImpl.callbacksMap.containsKey(fileName)) {
+  public ViceReader download(String fileName, String mode, VenusCB venusCB) throws IOException, RemoteException {
+    if (!fileExists(fileName) && mode.equals("rw")) {
+      addCallback(fileName, venusCB);
+      return null;
+    } else {
+      ViceReaderImpl viceReaderImpl = new ViceReaderImpl(fileName, ViceImpl.lockManager);
+      addCallback(fileName, venusCB);
+      return viceReaderImpl;
+    }
+  }
+
+  synchronized private void addCallback(String fileName, VenusCB venusCB) {
+    if (!ViceImpl.callbacksMap.containsKey(fileName)) {
       ViceImpl.callbacksMap.put(fileName, new ArrayList<VenusCB>());
     }
     ViceImpl.callbacksMap.get(fileName).add(venusCB);
   }
 
-  public ViceReader download(String fileName) throws IOException, RemoteException {
-    return new ViceReaderImpl(fileName, ViceImpl.lockManager);
-  }
-
   public ViceWriter upload(String fileName, VenusCB venusCB) throws IOException, RemoteException {
     ArrayList<VenusCB> callbacks = ViceImpl.callbacksMap.get(fileName);
-    int index = -1;
-    for(int i = 0; i < callbacks.size(); i++) {
-      if(!callbacks.get(i).equals(venusCB))
+    for (int i = 0; i < callbacks.size(); i++) {
+      if (!callbacks.get(i).equals(venusCB))
         callbacks.get(i).invalidate("./Cache/" + fileName);
-      else
-        index = i;
     }
-    ViceImpl.callbacksMap.get(fileName).remove(index);
-    
     return new ViceWriterImpl(fileName, ViceImpl.lockManager);
   }
 
@@ -47,5 +49,4 @@ public class ViceImpl extends UnicastRemoteObject implements Vice {
     File f = new File(AFSDir + fileName);
     return f.exists();
   }
-
 }
